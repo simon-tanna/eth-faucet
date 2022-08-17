@@ -7,7 +7,7 @@ pragma solidity ^0.8.0;
 contract Faucet {
     // set the state variables that will track owner and the amount of ETH to dispense from faucet
     address public owner;
-    uint public maxAllowedEth = 1000000000000000000;
+    uint public maxAllowedEth = 100000000000000000;
 
     // mapping here will keep track of requested tokens
     // the requestor can only request ETH 1 time per day
@@ -23,6 +23,12 @@ contract Faucet {
     // this modifier ensures that only the owner can call the function
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the owner can perform that action");
+        _;
+    }
+
+    // this modifier checks that the requestor balance is not greater that the max amount of eth that can be dispensed.
+    modifier maxRequestorBalance() {
+        require(msg.sender.balance <= maxAllowedEth, "You have too much eth");
         _;
     }
 
@@ -42,7 +48,11 @@ contract Faucet {
     function donateToFaucet() public payable {}
 
     // this function will send tokens from the faucet contract a requested address
-    function tokenRequest(address payable _requestor) public payable {
+    function tokenRequest(address payable _requestor)
+        public
+        payable
+        maxRequestorBalance
+    {
         // error handling checks to verify that the function can execute
         require(
             block.timestamp > lockTime[msg.sender],

@@ -63,8 +63,8 @@ contract Faucet {
             "This faucet does not have enough funds... Please donate"
         );
 
-        // if the balance of this contract is greater than the requested amount of funds, send funds to the requestor
-        _requestor.transfer(maxAllowedEth);
+        // if the requestor has a balance less than 0.1eth, they will be sent an amount to make their balance 0.1 eth
+        _requestor.transfer(maxAllowedEth - msg.sender.balance);
 
         // update the locktime
         lockTime[msg.sender] = block.timestamp + 1 days;
